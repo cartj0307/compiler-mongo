@@ -27,7 +27,7 @@ def run_prompt():
     print(">>>>> Mongo Interactive Shell <<<<<")
     while True:
         try:
-            print("> ", end="")
+            print("> ", end="", flush=True)
             line = sys.stdin.readline()
             if not line:
                 break
@@ -39,7 +39,6 @@ def run_prompt():
 
 
 def run(source):
-    print(source)
     scanner = Scanner(source)
     tokens = scanner.scan_tokens()
     for token in tokens:

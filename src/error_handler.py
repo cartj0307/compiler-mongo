@@ -5,8 +5,8 @@ class ErrorHandler:
     had_error = False
 
     @staticmethod
-    def error(line, message):
-        ErrorHandler.report(line, "", message)
+    def error(line, message, where=""):
+        ErrorHandler.report(line, where, message)
 
     @staticmethod
     def report(line, where, message):
