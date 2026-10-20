@@ -1,6 +1,8 @@
 import sys
 
+from ast_printer import AstPrinter
 from error_handler import ErrorHandler
+from parser import Parser
 from scanner import Scanner
 
 
@@ -41,8 +43,13 @@ def run_prompt():
 def run(source):
     scanner = Scanner(source)
     tokens = scanner.scan_tokens()
-    for token in tokens:
-        print(token)
+    parser = Parser(tokens)
+    expression = parser.parse()
+
+    if ErrorHandler.had_error:
+        return
+
+    print(AstPrinter().print(expression))
 
 
 if __name__ == "__main__":
