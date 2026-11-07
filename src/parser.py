@@ -1,5 +1,6 @@
 from error_handler import ErrorHandler
 from expr import Binary, Grouping, Literal, Unary
+from stmt import Expression, Print
 from token_type import TokenType
 
 
@@ -12,16 +13,33 @@ class Parser:
         self.current = 0
 
     def parse(self):
-        try:
-            expr = self.expression()
-            if not self.is_at_end():
-                raise self.error(self.peek(), "Expect end of expression.")
-            return expr
-        except Parser.ParseError:
-            return None
+        statements = []
+        while not self.is_at_end():
+            try:
+                statements.append(self.statement())
+            except Parser.ParseError:
+                self.synchronize()
+
+        return statements
 
     def expression(self):
         return self.equality()
+
+    def statement(self):
+        if self.match(TokenType.PRINT):
+            return self.print_statement()
+
+        return self.expression_statement()
+
+    def print_statement(self):
+        value = self.expression()
+        self.consume(TokenType.SEMICOLON, "Expect ';' after value.")
+        return Print(value)
+
+    def expression_statement(self):
+        expr = self.expression()
+        self.consume(TokenType.SEMICOLON, "Expect ';' after expression.")
+        return Expression(expr)
 
     def equality(self):
         expr = self.comparison()

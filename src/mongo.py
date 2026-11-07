@@ -1,9 +1,11 @@
 import sys
 
-from ast_printer import AstPrinter
 from error_handler import ErrorHandler
+from interpreter import Interpreter
 from parser import Parser
 from scanner import Scanner
+
+interpreter = Interpreter()
 
 
 def main(argv):
@@ -23,6 +25,8 @@ def run_file(path):
 
     if ErrorHandler.had_error:
         sys.exit(65)
+    if ErrorHandler.had_runtime_error:
+        sys.exit(70)
 
 
 def run_prompt():
@@ -44,12 +48,12 @@ def run(source):
     scanner = Scanner(source)
     tokens = scanner.scan_tokens()
     parser = Parser(tokens)
-    expression = parser.parse()
+    statements = parser.parse()
 
     if ErrorHandler.had_error:
         return
 
-    print(AstPrinter().print(expression))
+    interpreter.interpret(statements)
 
 
 if __name__ == "__main__":

@@ -5,6 +5,7 @@ from token_type import TokenType
 
 class ErrorHandler:
     had_error = False
+    had_runtime_error = False
 
     @staticmethod
     def error(line, message, where=""):
@@ -21,3 +22,8 @@ class ErrorHandler:
             ErrorHandler.report(token.line, " at end", message)
         else:
             ErrorHandler.report(token.line, f" at '{token.lexeme}'", message)
+
+    @staticmethod
+    def runtime_error(error):
+        print(f"{error}\n[line {error.token.line}]", file=sys.stderr)
+        ErrorHandler.had_runtime_error = True
