@@ -7,6 +7,9 @@ class AstPrinter(Visitor):
     def print(self, expr):
         return expr.accept(self)
 
+    def visit_assign_expr(self, expr):
+        return "(= " + expr.name.lexeme + " " + expr.value.accept(self) + ")"
+
     def visit_binary_expr(self, expr):
         return self.parenthesize(expr.operator.lexeme, expr.left, expr.right)
 
@@ -20,6 +23,9 @@ class AstPrinter(Visitor):
 
     def visit_unary_expr(self, expr):
         return self.parenthesize(expr.operator.lexeme, expr.right)
+
+    def visit_variable_expr(self, expr):
+        return expr.name.lexeme
 
     def parenthesize(self, name, *exprs):
         builder = "(" + name

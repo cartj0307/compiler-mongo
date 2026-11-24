@@ -1,11 +1,15 @@
 import expr
 import stmt
+from environment import Environment
 from error_handler import ErrorHandler
 from runtime_error import RuntimeError
 from token_type import TokenType
 
 
 class Interpreter(expr.Visitor, stmt.Visitor):
+    def __init__(self):
+        self.environment = Environment()
+
     def interpret(self, statements):
         try:
             for statement in statements:
@@ -67,6 +71,9 @@ class Interpreter(expr.Visitor, stmt.Visitor):
 
         return str(obj)
 
+    def visit_variable_expr(self, expr):
+        return self.environment.get(expr.name)
+
     def visit_grouping_expr(self, expr):
         return self.evaluate(expr.expression)
 
@@ -76,6 +83,20 @@ class Interpreter(expr.Visitor, stmt.Visitor):
     def execute(self, stmt):
         stmt.accept(self)
 
+    def execute_block(self, statements, environment):
+        previous = self.environment
+        try:
+            self.environment = environment
+
+            for statement in statements:
+                self.execute(statement)
+        finally:
+            self.environment = previous
+
+    def visit_block_stmt(self, stmt):
+        self.execute_block(stmt.statements, Environment(self.environment))
+        return None
+
     def visit_expression_stmt(self, stmt):
         self.evaluate(stmt.expression)
         return None
@@ -84,6 +105,19 @@ class Interpreter(expr.Visitor, stmt.Visitor):
         value = self.evaluate(stmt.expression)
         print(self.stringify(value))
         return None
+
+    def visit_var_stmt(self, stmt):
+        value = None
+        if stmt.initializer is not None:
+            value = self.evaluate(stmt.initializer)
+
+        self.environment.define(stmt.name.lexeme, value)
+        return None
+
+    def visit_assign_expr(self, expr):
+        value = self.evaluate(expr.value)
+        self.environment.assign(expr.name, value)
+        return value
 
     def visit_binary_expr(self, expr):
         left = self.evaluate(expr.left)

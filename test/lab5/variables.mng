@@ -1,0 +1,11 @@
+var a = 1;
+var b = 2;
+print a + b;
+var c;
+print c;
+c = "assigned";
+print c;
+print a = 3;
+print a;
+var a = "redeclared";
+print a;
